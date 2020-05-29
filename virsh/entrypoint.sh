@@ -9,8 +9,11 @@ set -x
 addtional_block_devs=3
 addtional_block_size=32G
 
+
 function create_nodes() {
-	echo "Creating nodes"
+    echo "Creating nodes"
+    abridge="br-${RANDOM}"
+    brctl addbr "${abridge}"
     for aNode in $(seq 1 ${node_count}); do
         user_name="empty-${RANDOM}"
 
@@ -33,7 +36,7 @@ function create_nodes() {
             --os-variant "ubuntu${ubuntu_release}" \
             --name "${libvirt_domain}" \
             --memory 16384 \
-            --network bridge=test \
+            --network bridge="${abridge}" \
             --cpu host-passthrough \
             --vcpus 4 \
             --import \
@@ -43,7 +46,7 @@ function create_nodes() {
             --print-xml > /tmp/create_vm_${libvirt_domain}.xml
 
         virsh define /tmp/create_vm_${libvirt_domain}.xml
-    done
+done
 }
 
 function start_nodes() {
