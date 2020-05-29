@@ -56,7 +56,7 @@ function start_nodes() {
 }
 
 function delete_nodes() {
-    virsh list | grep empty | awk '{print $2}' | while read vdomain; do
+    virsh list --all | grep empty | awk '{print $2}' | while read vdomain; do
         virsh destroy ${vdomain}
         virsh undefine ${vdomain}
         for addtional_block_dev in $(seq 1 ${addtional_block_devs}); do
