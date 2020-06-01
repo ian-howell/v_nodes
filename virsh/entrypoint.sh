@@ -1,12 +1,12 @@
 #!/bin/bash
 set -x
 
-: "${node_count:=3}"
+: "${node_count:=1}"
 : "${image_pool:="/var/lib/libvirt/images"}"
 : "${ubuntu_release:="18.04"}"
 : "${base_image:="ubuntu-18.04.qcow2"}"
 
-addtional_block_devs=3
+addtional_block_devs=1
 addtional_block_size=32G
 
 
@@ -56,7 +56,10 @@ function start_nodes() {
 }
 
 function delete_nodes() {
-    virsh list --all | grep empty | awk '{print $2}' | while read vdomain; do
+    virsh list --all | grep 'running' | grep empty | awk '{print $2}' | while read vdomain; do
+        virsh shutdown ${vdomain}
+    done
+    virsh list --all | grep 'shut off' | grep empty | awk '{print $2}' | while read vdomain; do
         virsh destroy ${vdomain}
         virsh undefine ${vdomain}
         for addtional_block_dev in $(seq 1 ${addtional_block_devs}); do

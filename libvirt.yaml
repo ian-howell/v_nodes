@@ -3,8 +3,10 @@ kind: Pod
 metadata:
   name: vairship
   namespace: airshipdev
+  labels:
+    app: sushy-emulator
 spec:
-  hostNetwork: true
+  hostNetwork: false 
   containers:
   - name: libvirt
     image: slfletch/libvirt:0.1.0

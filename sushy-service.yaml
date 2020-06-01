@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: sushy-service
+spec:
+  selector:
+    app: sushy-emulator
+  ports:
+  - protocol: TCP
+    port: 8050
+    targetPort: 8000
