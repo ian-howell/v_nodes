@@ -11,28 +11,31 @@ addtional_block_size=32G
 
 
 function create_nodes() {
-    echo "Creating nodes"
-    abridge="br-${RANDOM}"
-    brctl addbr "${abridge}"
-    for aNode in $(seq 1 ${node_count}); do
-        user_name="empty-${RANDOM}"
+    while [ "x$(virsh version | grep Running | awk '{print $1}')" != "xRunning" ]; do
+      echo "virsh is not running"
+      sleep 2
+    done
+      abridge="br-${RANDOM}"
+      brctl addbr "${abridge}"
+      for aNode in $(seq 1 ${node_count}); do
+         user_name="empty-${RANDOM}"
 
-        vm_name="airshipdev"
-        libvirt_domain="${user_name}-${vm_name}"
+         vm_name="airshipdev"
+         libvirt_domain="${user_name}-${vm_name}"
 
-        virtinstall_addtional_block_dev_args=""
-        for addtional_block_dev in $(seq 1 ${addtional_block_devs}); do
+         virtinstall_addtional_block_dev_args=""
+         for addtional_block_dev in $(seq 1 ${addtional_block_devs}); do
             qemu-img create \
             -f qcow2 \
             "${image_pool}/${libvirt_domain}_${addtional_block_dev}.qcow2" "${addtional_block_size}"
             virtinstall_addtional_block_dev_args="$virtinstall_addtional_block_dev_args --disk ${image_pool}/${libvirt_domain}_${addtional_block_dev}.qcow2,bus=scsi,format=qcow2"
-        done
+         done
 
-        echo ${virtinstall_addtional_block_dev_args}
+         echo ${virtinstall_addtional_block_dev_args}
 
-        setfacl -m u:libvirt-qemu:r-x ${image_pool}
+         setfacl -m u:libvirt-qemu:r-x ${image_pool}
 
-        virt-install --connect qemu:///system \
+         virt-install --connect qemu:///system \
             --os-variant "ubuntu${ubuntu_release}" \
             --name "${libvirt_domain}" \
             --memory 16384 \
@@ -45,8 +48,8 @@ function create_nodes() {
             --noautoconsole \
             --print-xml > /tmp/create_vm_${libvirt_domain}.xml
 
-        virsh define /tmp/create_vm_${libvirt_domain}.xml
-done
+         virsh define /tmp/create_vm_${libvirt_domain}.xml
+      done
 }
 
 function start_nodes() {
@@ -56,11 +59,8 @@ function start_nodes() {
 }
 
 function delete_nodes() {
-    virsh list --all | grep 'running' | grep empty | awk '{print $2}' | while read vdomain; do
-        virsh shutdown ${vdomain}
-    done
-    virsh list --all | grep 'shut off' | grep empty | awk '{print $2}' | while read vdomain; do
-        virsh destroy ${vdomain}
+    virsh list --all | grep empty | awk '{print $2}' | while read vdomain; do
+        virsh destroy ${vdomain} 
         virsh undefine ${vdomain}
         for addtional_block_dev in $(seq 1 ${addtional_block_devs}); do
             rm -v "${image_pool}/${vdomain}_${addtional_block_dev}.qcow2"

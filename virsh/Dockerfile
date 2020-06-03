@@ -1,9 +1,9 @@
 FROM ubuntu:18.04
 
-RUN apt-get update && apt-get install -y virt-manager rand virtinst 
+RUN apt-get update && apt-get install -y virt-manager rand virtinst
+
 COPY entrypoint.sh /var/tmp/entrypoint.sh
 
-RUN echo 'stdio_handler="file"' >> /etc/libvirt/qemu.conf
 RUN echo 'user = "root"' >> /etc/libvirt/qemu.conf
 RUN echo 'group = "root"' >> /etc/libvirt/qemu.conf
 

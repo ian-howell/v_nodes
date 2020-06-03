@@ -9,17 +9,27 @@ spec:
   hostNetwork: false 
   containers:
   - name: libvirt
-    image: slfletch/libvirt:0.1.0
+    image: port/libvirt:latest
+    tty: true
     securityContext:
       privileged: true
-    command: ["libvirtd"]
+      #SYS_ADMIN required for systemd, need to work out reqs for libvirt
+    command:
+      - /bin/systemd
     volumeMounts:
     - name: dev
       mountPath: /dev
+    - name: tmp
+      mountPath: /tmp
+    - name: run
+      mountPath: /run
     - name: var-lib-libvirt-images
       mountPath: /var/lib/libvirt/images
     - name: var-run-libvirt
       mountPath: /var/run/libvirt
+    - name: sys-fs-cgroup
+      mountPath: /sys/fs/cgroup
+      readOnly: false
   - name: virsh
     image: slfletch/virsh:0.1.0
     securityContext:
@@ -35,6 +45,8 @@ spec:
       mountPath: /dev
     - name: tmp
       mountPath: /tmp
+    - name: run
+      mountPath: /run
     - name: var-lib-libvirt-images
       mountPath: /var/lib/libvirt/images
     - name: var-run-libvirt
@@ -43,11 +55,18 @@ spec:
     image: slfletch/sushy-emulator:0.1.0
     securityContext:
       privileged: true
+    command:
+      - bash
+      - -cex
+      - |
+        tail -f /dev/null 
     volumeMounts:
     - name: dev
       mountPath: /dev
     - name: tmp
       mountPath: /tmp
+    - name: run
+      mountPath: /run
     - name: var-lib-libvirt-images
       mountPath: /var/lib/libvirt/images
     - name: var-run-libvirt
@@ -57,11 +76,18 @@ spec:
     hostPath:
       path: /dev
   - name: tmp
-    hostPath:
-      path: /tmp
+    emptyDir:
+      medium: "Memory"
+  - name: run
+    emptyDir:
+      medium: "Memory"
   - name: var-lib-libvirt-images
     hostPath:
       path: /tmp/vms
   - name: var-run-libvirt
     hostPath:
       path: /tmp/stuff
+  - name: sys-fs-cgroup
+    hostPath:
+      path: /sys/fs/cgroup
+
