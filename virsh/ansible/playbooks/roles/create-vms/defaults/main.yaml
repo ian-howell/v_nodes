@@ -1,0 +1,11 @@
+  vm:
+    node_count: 3
+    image_pool: "/var/lib/libvirt/images"
+    os_variant: "ubuntu18.04"
+    block_size: 32G
+    block_devs: 3
+    user_name: "empty"
+    vm_name: "airshipdev"
+    memory: 16384
+    uri: "qemu:///system"
+    vcpus: 4
