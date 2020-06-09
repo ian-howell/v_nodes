@@ -1,56 +1,36 @@
-  - name: "Create node {{ vm_instance }}"
-    become: yes
-    tasks:
-      - name: Create bridge name
-        shell: echo "br-${RANDOM}"
-        register: bridge_name
-      - name: Create random username
-        shell: echo "{{ username }}-${RANDOM}"
-        register: node_username
-      - name: Create libvirt domain name
-        shell: echo "{{ node_username }}-{{ node_name }}"
-        register: libvirt_domain_name
-      - name: Create qcow image name
-        shell: echo "{{ image_pool }}/{{ libvirt_domain_name }}_{{ bridge_name }}"
-        register: qcow_image
-      - name: "Create {{ block_devs }} qemu images"
-        shell: "qemu-img create -f qcow2 {{ image_pool }}/{{ libvirt_domain_name }}_{{ item }}.qcow2 {{ block_size }}"
-        with_sequence: start=1 end={{ block_devs }}
-      - name: Iterate to create block devices and arguments
-        shell: |
-          qemu-img create \
-                 -f qcow2 \
-                 "{{ image_pool }}/{{ libvirt_domain_name }}_{{ item }}.qcow2" "{{ block_size }}"
-        with_sequence: start: 1 end={{ block_devs }}
-      - name: Iterate to create arguments
-        shell: |
-          virtinstall_additional_block_dev_args=""
-          for additional_block_dev in $(seq 1 {{ block_devs }}); do
-            virtinstall_additional_block_dev_args="${virtinstall_additional_block_dev_args} --disk {{ image_pool }}/{{ libvirt_domain_name }}_${block_devs}.qcow2,bus=scsi,format=qcow2"
-          done
-          echo "${virtinstall_additional_block_dev_args}"
-        register: virtinstall_additional_block_dev_args
-      - name: setfacl
-        shell: setfacl -m u:libvirt-qemu:r-x {{ image_pool }}
-      - name: Define vm xml
-        shell: |
-            virt-install \
-            --connect "{{ uri }}" \
-            --os-variant "{{ os_variant }}" \
-            --name "{{ libvirt_domain_name }}" \
-            --memory "{{ memory }}" \
-            --network bridge="{{ bridge_name }}" \
-            --cpu host-passthrough \
-            --vcpus {{ vcpus }} \
-            --import \
-            {{ virtinstall_addtional_block_dev_args }}  \
-            --nographics \
-            --noautoconsole \
-            --print-xml > /tmp/create_vm_{{ libvirt_domain_name }}.xml
-      - register: create_vm_{{libvirt_domain_name }}.xml
-      - name: Create vm
-        virt:
-          command: define
-          xml: "create_vm_{{libvirt_domain_name }}.xml"
+- set_fact:
+    libvirt_domain_name: "{{ vm.node_name }}-{{ vm_instance }}"
+  run_once: yes
 
+- name: "Create qemu image extra block devices"
+  shell: |
+        qemu-img create \
+            -f qcow2 \
+            "{{ vm.image_pool }}/{{ libvirt_domain_name }}-{{ item }}".qcow2 "{{ vm.block_size }}"
+  with_sequence: start=1 end="{{ vm.block_devs | int }}"
 
+- name: "setfacl"
+  shell: "setfacl -m u:libvirt-qemu:r-x {{ vm.image_pool }}"
+
+- name: Define vm xml
+  shell: |
+    virt-install \
+       --connect "{{ vm.uri }}" \
+       --os-variant "{{ vm.os_variant }}" \
+       --name "{{ libvirt_domain_name }}" \
+       --memory "{{ vm.memory }}" \
+       --network bridge="{{ vm.bridge_name }}" \
+       --cpu host-passthrough \
+       --vcpus "{{ vm.vcpus | int }}" \
+       --import \
+       {% for i in range(1, vm.block_devs + 1) %}
+        --disk "{{ vm.image_pool }}/{{ libvirt_domain_name }}-{{ i }}.qcow2,bus=scsi,format=qcow2" \
+        {% endfor %}
+       --nographics \
+       --noautoconsole \
+       --print-xml > "/tmp/create_vm_{{ libvirt_domain_name }}.xml"
+
+- name: Create vm
+  virt:
+    command: define
+    xml: "/tmp/create_vm_{{ libvirt_domain_name }}.xml"

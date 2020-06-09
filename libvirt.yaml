@@ -9,7 +9,7 @@ spec:
   hostNetwork: false 
   containers:
   - name: libvirt
-    image: port/libvirt:latest
+    image: slfletch/libvirt:0.1.0
     tty: true
     securityContext:
       privileged: true
@@ -31,14 +31,14 @@ spec:
       mountPath: /sys/fs/cgroup
       readOnly: false
   - name: virsh
-    image: slfletch/virsh:0.1.0
+    image: slfletch/virsh:0.2.0
     securityContext:
       privileged: true
     command:
     - bash
     - -cex
     - |
-      /var/tmp/entrypoint.sh create_nodes
+      /opt/ansible/entrypoint.sh create
       tail -f /dev/null 
     volumeMounts:
     - name: dev

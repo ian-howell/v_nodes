@@ -1,6 +1,6 @@
 - name: "Create nodes"
   include_tasks: create-vm.yaml
   with_sequence:
-    start=1 end="{{ node_count | int }}"
+    start=1 end="{{ vm.node_count | int }}"
   loop_control:
     loop_var: vm_instance

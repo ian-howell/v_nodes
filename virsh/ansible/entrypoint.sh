@@ -4,7 +4,7 @@ set -ex
 : "${action:="create"}"
 
 if [[ "${action}" == "create" ]]; then
-    ansible-playbook -i /opt/assets/playbooks/inventory.yaml /opt/assets/playbooks/create.yaml
+    ansible-playbook -v -i /opt/ansible/playbooks/inventory.yaml /opt/ansible/playbooks/create.yaml
 else
     echo "\${action} value ${action} does not match an expected value"
     exit 1
