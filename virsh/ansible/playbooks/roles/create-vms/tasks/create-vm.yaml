@@ -2,12 +2,19 @@
     libvirt_domain_name: "{{ vm.node_name }}-{{ vm_instance }}"
   run_once: yes
 
+- set_fact:
+    bridge_name: "br-{{ 1000 | random }}"
+  run_once: yes
+
 - name: "Create qemu image extra block devices"
   shell: |
         qemu-img create \
             -f qcow2 \
             "{{ vm.image_pool }}/{{ libvirt_domain_name }}-{{ item }}".qcow2 "{{ vm.block_size }}"
   with_sequence: start=1 end="{{ vm.block_devs | int }}"
+
+- name: "Create bridge"
+  shell: brctl addbr "{{ bridge_name }}"
 
 - name: "setfacl"
   shell: "setfacl -m u:libvirt-qemu:r-x {{ vm.image_pool }}"
@@ -19,7 +26,7 @@
        --os-variant "{{ vm.os_variant }}" \
        --name "{{ libvirt_domain_name }}" \
        --memory "{{ vm.memory }}" \
-       --network bridge="{{ vm.bridge_name }}" \
+       --network bridge="{{ bridge_name }}" \
        --cpu host-passthrough \
        --vcpus "{{ vm.vcpus | int }}" \
        --import \

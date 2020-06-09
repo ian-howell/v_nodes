@@ -11,6 +11,7 @@ RUN apt-get update ;\
         python3-pip \
         python3-apt \
         virtinst \
+        bridge-utils \
         python3-setuptools \
         virt-manager \
         openssh-client ;\
