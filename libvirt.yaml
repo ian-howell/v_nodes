@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: vairship5
+  name: vairship7
   namespace: airshipdev
   labels:
     app: sushy-emulator
@@ -52,13 +52,14 @@ spec:
     - name: var-run-libvirt
       mountPath: /var/run/libvirt
   - name: sushy-emulator
-    image: slfletch/sushy-emulator:0.1.0
+    image: slfletch/sushy:0.2.0
     securityContext:
       privileged: true
     command:
       - bash
       - -cex
       - |
+        /opt/bin/entrypoint.sh
         tail -f /dev/null 
     volumeMounts:
     - name: dev
