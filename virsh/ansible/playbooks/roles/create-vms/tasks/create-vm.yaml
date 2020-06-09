@@ -28,9 +28,10 @@
         {% endfor %}
        --nographics \
        --noautoconsole \
-       --print-xml > "/tmp/create_vm_{{ libvirt_domain_name }}.xml"
+       --print-xml 
+  register: vm_xml
 
 - name: Create vm
   virt:
     command: define
-    xml: "/tmp/create_vm_{{ libvirt_domain_name }}.xml"
+    xml: "{{ vm_xml.stdout }}"
