@@ -1,5 +1,5 @@
 vm:
-  node_count: 3
+  node_count: 4 
   image_pool: "/var/lib/libvirt/images"
   os_variant: "ubuntu18.04"
   block_size: 32G

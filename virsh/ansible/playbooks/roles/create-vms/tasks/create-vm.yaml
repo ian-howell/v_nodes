@@ -19,6 +19,10 @@
 - name: "setfacl"
   shell: "setfacl -m u:libvirt-qemu:r-x {{ vm.image_pool }}"
 
+- name: "Create MAC address"
+  shell: echo "00:60:2f$(od -txC -An -N3 /dev/random|tr \  :)"
+  register: macaddr
+
 - name: Define vm xml
   shell: |
     virt-install \
@@ -26,7 +30,7 @@
        --os-variant "{{ vm.os_variant }}" \
        --name "{{ libvirt_domain_name }}" \
        --memory "{{ vm.memory }}" \
-       --network bridge="{{ bridge_name }}" \
+       --network bridge="{{ bridge_name }}",mac="{{ macaddr.stdout }}" \
        --cpu host-passthrough \
        --vcpus "{{ vm.vcpus | int }}" \
        --import \
@@ -35,7 +39,7 @@
         {% endfor %}
        --nographics \
        --noautoconsole \
-       --print-xml 
+       --print-xml
   register: vm_xml
 
 - name: Create vm
