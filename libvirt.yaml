@@ -52,7 +52,28 @@ spec:
     - name: var-run-libvirt
       mountPath: /var/run/libvirt
   - name: sushy-emulator
-    image: slfletch/sushy:0.2.0
+    image: slfletch/sushy-emulator:0.3.0
+    securityContext:
+      privileged: true
+    command:
+      - bash
+      - -cex
+      - |
+        /opt/bin/entrypoint.sh
+        tail -f /dev/null 
+    volumeMounts:
+    - name: dev
+      mountPath: /dev
+    - name: tmp
+      mountPath: /tmp
+    - name: run
+      mountPath: /run
+    - name: var-lib-libvirt-images
+      mountPath: /var/lib/libvirt/images
+    - name: var-run-libvirt
+      mountPath: /var/run/libvirt
+  - name: airshipctl 
+    image: slfletch/airshipctl:0.1.0
     securityContext:
       privileged: true
     command:
