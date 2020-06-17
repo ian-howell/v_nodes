@@ -1,2 +1,0 @@
-- name: "Start nodes"
-  include_tasks: start-nodes.yaml

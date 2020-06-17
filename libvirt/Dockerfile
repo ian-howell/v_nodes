@@ -1,21 +1,27 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
-RUN apt-get update && apt-get install -y libvirt-daemon libvirt-bin libvirt-daemon-system libvirt-clients systemd
+RUN apt-get update && apt-get install -y libvirt-daemon qemu-kvm libvirt-daemon-system libvirt-clients systemd
 
 RUN find /etc/systemd/system \
-         /lib/systemd/system \
+         /usr/lib/systemd/system \
          -path '*.wants/*' \
          -not -name '*journald*' \
          -not -name '*systemd-tmpfiles*' \
-         -not -name '*systemd-user-sessions*'\ 
-         -exec rm \{} \;
-RUN systemctl set-default multi-user.target
-RUN systemctl enable libvirtd
-RUN systemctl enable virtlogd
-COPY drop-ins/10-logs.conf /lib/systemd/system/libvirtd.service.d/10-logs.conf
-COPY drop-ins/10-logs.conf /lib/systemd/system/virtlogd.service.d/10-logs.conf
+         -not -name '*systemd-user-sessions*' \
+         -exec rm \{} \; ;\
+    systemctl set-default multi-user.target ;\
+    systemctl enable libvirtd ;\
+    systemctl enable virtlogd ;\
+    echo 'user = "root"' >> /etc/libvirt/qemu.conf ;\
+    echo 'group = "root"' >> /etc/libvirt/qemu.conf ;\
+    sed -i 's|unix_sock_rw_perms = "0770"|unix_sock_rw_perms = "0777"|g' /etc/libvirt/libvirtd.conf ;\
+    useradd -u 42424 -g libvirt -M -d /home/sushy -c "apache sushy user" sushy ;\
+    mkdir -p /home/sushy ;\
+    chown -R sushy /home/sushy
 
-RUN echo 'user = "root"' >> /etc/libvirt/qemu.conf
-RUN echo 'group = "root"' >> /etc/libvirt/qemu.conf
+COPY assets /opt/assets/
+RUN echo hey ;\
+    cp -ravf /opt/assets/* / ;\
+    rm -rf /opt/assets
 
 ENTRYPOINT /bin/systemd

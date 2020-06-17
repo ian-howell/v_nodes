@@ -1,21 +1,18 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: vairship7
-  namespace: airshipdev
-  labels:
-    app: sushy-emulator
+  name: vairship
 spec:
   hostNetwork: false 
   containers:
   - name: libvirt
-    image: slfletch/libvirt:0.1.0
+    image: port/libvirt:latest
     tty: true
     securityContext:
       privileged: true
       #SYS_ADMIN required for systemd, need to work out reqs for libvirt
     command:
-      - /bin/systemd
+    - /bin/systemd
     volumeMounts:
     - name: dev
       mountPath: /dev
@@ -31,7 +28,7 @@ spec:
       mountPath: /sys/fs/cgroup
       readOnly: false
   - name: virsh
-    image: slfletch/virsh:0.2.0
+    image: port/virsh:latest
     securityContext:
       privileged: true
     command:
@@ -51,15 +48,15 @@ spec:
       mountPath: /var/lib/libvirt/images
     - name: var-run-libvirt
       mountPath: /var/run/libvirt
-  - name: sushy-emulator
-    image: slfletch/sushy-emulator:0.3.0
+  - name: sushy
+    image: port/sushy:latest
     securityContext:
       privileged: true
     command:
       - bash
       - -cex
       - |
-        /opt/bin/entrypoint.sh
+        /entrypoint.sh
         tail -f /dev/null 
     volumeMounts:
     - name: dev
@@ -72,27 +69,27 @@ spec:
       mountPath: /var/lib/libvirt/images
     - name: var-run-libvirt
       mountPath: /var/run/libvirt
-  - name: airshipctl 
-    image: slfletch/airshipctl:0.1.0
-    securityContext:
-      privileged: true
-    command:
-      - bash
-      - -cex
-      - |
-        /opt/bin/entrypoint.sh
-        tail -f /dev/null 
-    volumeMounts:
-    - name: dev
-      mountPath: /dev
-    - name: tmp
-      mountPath: /tmp
-    - name: run
-      mountPath: /run
-    - name: var-lib-libvirt-images
-      mountPath: /var/lib/libvirt/images
-    - name: var-run-libvirt
-      mountPath: /var/run/libvirt
+  # - name: airshipctl 
+  #   image: slfletch/airshipctl:0.1.0
+  #   securityContext:
+  #     privileged: true
+  #   command:
+  #     - bash
+  #     - -cex
+  #     - |
+  #       /opt/bin/entrypoint.sh
+  #       tail -f /dev/null 
+  #   volumeMounts:
+  #   - name: dev
+  #     mountPath: /dev
+  #   - name: tmp
+  #     mountPath: /tmp
+  #   - name: run
+  #     mountPath: /run
+  #   - name: var-lib-libvirt-images
+  #     mountPath: /var/lib/libvirt/images
+  #   - name: var-run-libvirt
+  #     mountPath: /var/run/libvirt
   volumes:
   - name: dev
     hostPath:

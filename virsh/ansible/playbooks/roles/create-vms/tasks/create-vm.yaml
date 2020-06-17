@@ -42,6 +42,9 @@
        --print-xml
   register: vm_xml
 
+- debug:
+    msg: "{{ vm_xml.stdout }}"
+
 - name: Create vm
   virt:
     command: define
