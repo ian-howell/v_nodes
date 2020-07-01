@@ -1,0 +1,62 @@
+- acl:
+    default: true
+    path: "{{ vm.default_image_pool }}"
+    entry: "u:libvirt-qemu:r-x"
+    state: present
+
+- name: "Define, Build, and Start default storage pool"
+  block:
+    - virt_pool:
+        command: define
+        name: default
+        xml: '{{ lookup("template", "dir.xml.j2") }}'
+
+    - virt_pool:
+        command: build
+        name: default
+  
+    - virt_pool:
+        command: create
+        name: default
+
+    - virt_pool:
+        command: list_pools
+
+- name: "Define network"
+  virt_net:
+    command: define
+    xml: '{{ lookup("template", "air_prov.xml.j2") }}'
+    name: "air_prov"
+
+- name: "Start network"
+  virt_net:
+    state: active
+    name: "air_prov"
+
+- name: "Autostart network"
+  virt_net:
+    name: "air_prov"
+    autostart: true
+
+- name: "Define network"
+  virt_net:
+    command: define
+    xml: '{{ lookup("template", "air_nat.xml.j2") }}'
+    name: "air_nat"
+
+- name: "Start network"
+  virt_net:
+    state: active
+    name: "air_nat"
+
+- name: "Autostart network"
+  virt_net:
+    name: "air_nat"
+    autostart: true
+
+- name: "Create nodes"
+  include_tasks: create-vm.yaml
+  with_sequence:
+    start=0 end="{{ vm.node_count-1 | int }}"
+  loop_control:
+    loop_var: vm_instance

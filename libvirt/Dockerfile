@@ -1,8 +1,19 @@
-FROM ubuntu:20.04
+FROM vairship/base:latest
 
-RUN apt-get update && apt-get install -y libvirt-daemon qemu-kvm libvirt-daemon-system libvirt-clients systemd
+SHELL ["bash", "-exc"]
+ENV DEBIAN_FRONTEND noninteractive
 
-RUN find /etc/systemd/system \
+RUN apt-get update ;\
+    apt-get dist-upgrade -y ;\
+    apt-get install -y \
+            libvirt-daemon \
+            qemu-kvm \
+            libvirt-daemon-system \
+            bridge-utils \
+            libvirt-clients \
+            systemd \
+            socat ;\
+    find /etc/systemd/system \
          /usr/lib/systemd/system \
          -path '*.wants/*' \
          -not -name '*journald*' \
@@ -20,8 +31,7 @@ RUN find /etc/systemd/system \
     chown -R sushy /home/sushy
 
 COPY assets /opt/assets/
-RUN echo hey ;\
-    cp -ravf /opt/assets/* / ;\
+RUN cp -ravf /opt/assets/* / ;\
     rm -rf /opt/assets
 
 ENTRYPOINT /bin/systemd

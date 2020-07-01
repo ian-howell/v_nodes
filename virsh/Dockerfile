@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM vairship/base:latest
 
 SHELL ["bash", "-exc"]
 ENV DEBIAN_FRONTEND noninteractive
@@ -10,7 +10,11 @@ RUN apt-get update ;\
         python3-minimal \
         python3-pip \
         python3-apt \
+        python3-lxml \
+        python3-libvirt \
         virtinst \
+        nfs4-acl-tools \
+        acl \
         bridge-utils \
         python3-setuptools \
         virt-manager \
@@ -19,8 +23,8 @@ RUN apt-get update ;\
     pip3 install --upgrade ansible ;\
     rm -rf /var/lib/apt/lists/*
 
-COPY ansible /opt/ansible
+COPY assets /opt/assets/
+RUN cp -ravf /opt/assets/* / ;\
+    rm -rf /opt/assets
 
-RUN chmod +x /opt/ansible/entrypoint.sh && ls -ltr /opt/ansible/entrypoint.sh
-
-CMD /opt/ansible/entrypoint.sh
+ENTRYPOINT /entrypoint.sh

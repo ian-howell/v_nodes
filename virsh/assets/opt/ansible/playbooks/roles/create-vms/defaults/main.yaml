@@ -1,0 +1,19 @@
+#First pass at default variables that will match up to existing gates
+vm:
+  node_count: 2
+  image_pool: "/var/lib/libvirt/images"
+  default_image_pool: "/var/lib/libvirt/default"
+  os_variant: "ubuntu18.04"
+  block_size: 32G
+  block_devs: 3
+  node_name:
+    - "air-ephemeral"
+    - "air-target"
+  memory: 16384
+  uri: "qemu:///system"
+  vcpus: 4
+  bridge_name: "prov-br"
+  bootMacAddress:
+    - 52:54:00:b6:ed:31
+    - 52:54:00:9b:27:4c
+
