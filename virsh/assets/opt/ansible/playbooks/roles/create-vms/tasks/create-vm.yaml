@@ -1,37 +1,48 @@
+- name: "print"
+  shell: echo "{{ a_node }}"
+
+- name: "print"
+  shell: echo "{{ vm_instance }}"
+
 - set_fact:
-    libvirt_domain_name: "{{ vm.node_name[ vm_instance | int ] }}"
+    qcow_rand: "{{ 6000 | random }}" 
 
 - name: "Create qemu image extra block devices"
   shell: |
         qemu-img create \
             -f qcow2 \
-            "{{ vm.image_pool }}/{{ libvirt_domain_name }}-{{ item }}".qcow2 "{{ vm.block_size }}"
-  with_sequence: start=1 end="{{ vm.block_devs | int }}"
+            "{{ floorplan.image_pool }}/{{ vm_instance.name }}-{{qcow_rand}}".qcow2 "{{ vm_instance.block[seq | int] }}"
+  with_sequence:
+    start=0 end="{{ (vm_instance.block | length | int )-1}}"
+  loop_control:
+    loop_var: seq
 
-- name: "Create bridge"
-  shell: "brctl addbr {{ vm.bridge_name }} || true"
+#- name: "Create bridge"
+#  shell: "brctl addbr {{ .bridge_name }} || true"
 
 - acl:
     default: true
-    path: "{{ vm.image_pool }}"
+    path: "{{ floorplan.image_pool }}"
     entry: "u:libvirt-qemu:r-x"
     state: present
 
 - name: Define vm xml
+#
+        #--network network="air_nat",address.type='pci',address.domain=0,address.bus=0,address.slot=3,address.function=0,mac="{{ vm_instance.bootMacAddress }}"
   shell: |
     virt-install \
-        --connect "{{ vm.uri }}" \
-        --os-variant "{{ vm.os_variant }}" \
+        --connect "{{ floorplan.uri }}" \
+        --os-variant "{{ floorplan.os_variant }}" \
         --machine pc \
-        --name "{{ libvirt_domain_name }}" \
-        --memory "{{ vm.memory }}" \
-        --network network="air_nat",mac="{{ vm.bootMacAddress[ vm_instance | int ] }}" \
-        --network network="air_prov",mac="{{ vm.bootMacAddress[ vm_instance | int ] }}" \
+        --name "{{ vm_instance.name }}-{{ a_node }}" \
+        --memory "{{ vm_instance.ram }}" \
+        --network network="air_nat",address.type='pci',address.domain=0,address.bus=0,address.slot=3,address.function=0 \
+        --network network="air_prov",address.type='pci',address.domain=0,address.bus=0,address.slot=4,address.function=0 \
         --cpu host-passthrough \
-        --vcpus "{{ vm.vcpus | int }}" \
+        --vcpus "{{ vm_instance.cpu | int }}" \
         --import \
-        {% for i in range(1, vm.block_devs + 1) %}
-        --disk "{{ vm.image_pool }}/{{ libvirt_domain_name }}-{{ i }}.qcow2,bus=scsi,format=qcow2" \
+        {% for i in range(0, (vm_instance.block | length | int )-1) %}
+        --disk "{{ floorplan.image_pool }}/{{ vm_instance.name }}-{{ qcow_rand }}.qcow2,bus=scsi,format=qcow2" \
         {% endfor %}
         --nographics \
         --noautoconsole \

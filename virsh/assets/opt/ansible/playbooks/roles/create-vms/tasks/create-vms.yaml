@@ -1,0 +1,8 @@
+- debug:
+    msg: "{{ vm_instance }}"
+
+- name: "Create nodes"
+  include_tasks: create-vm.yaml
+  with_sequence: start=1 end="{{vm_instance.count | int}}"
+  loop_control:
+    loop_var: a_node

@@ -2,7 +2,7 @@
 BUILD_DIR         := $(shell mktemp -d)
 IMAGE_REGISTRY    ?= vairship
 IMAGE_NAME        ?= base,virsh,libvirt,sushy,runner
-IMAGE_TAG         ?= latest
+IMAGE_TAG         ?= 2 
 HELM              ?= $(BUILD_DIR)/helm
 PROXY             ?= http://proxy.foo.com:8000
 NO_PROXY          ?= localhost,127.0.0.1,.svc.cluster.local

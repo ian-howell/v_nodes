@@ -1,62 +1,82 @@
 - acl:
     default: true
-    path: "{{ vm.default_image_pool }}"
+    path: "{{ floorplan.default_image_pool }}"
     entry: "u:libvirt-qemu:r-x"
     state: present
+
+- name: "Delete storage pools"
+  block:
+    # Stop a storage pool
+    - virt_pool:
+        command: destroy
+        name: "{{ item }}"
+      with_items:
+        - default
+      ignore_errors: true
+# Delete a storage pool (destroys contents)
+    - virt_pool:
+        command: delete
+        name: "{{ item }}"
+      with_items:
+        - default
+      ignore_errors: true
+    - virt_pool:
+        command: undefine
+        name: "{{ item }}"
+      with_items:
+        - default
+      ignore_errors: true
 
 - name: "Define, Build, and Start default storage pool"
   block:
     - virt_pool:
         command: define
-        name: default
-        xml: '{{ lookup("template", "dir.xml.j2") }}'
+        name: "{{ item }}"
+        xml: '{{ lookup("template", "{{ item }}.xml.j2") }}'
+      with_items:
+        - default
 
     - virt_pool:
         command: build
-        name: default
+        name: "{{ item }}"
+      with_items:
+        - default
   
     - virt_pool:
         command: create
-        name: default
-
+        name: "{{ item }}"
+      with_items:
+        - default
     - virt_pool:
         command: list_pools
 
-- name: "Define network"
-  virt_net:
-    command: define
-    xml: '{{ lookup("template", "air_prov.xml.j2") }}'
-    name: "air_prov"
+- name: "Define network, activate, start network pools"
+  block:
+    - virt_net:
+        command: define
+        xml: '{{ lookup("template", "{{ item }}.xml.j2") }}'
+        name: "{{ item }}"
+      with_items:
+        - "air_prov"
+        - "air_nat"
 
-- name: "Start network"
-  virt_net:
-    state: active
-    name: "air_prov"
+    - virt_net:
+        state: active
+        name: "{{ item }}"
+      with_items:
+        - "air_prov"
+        - "air_nat"
 
-- name: "Autostart network"
-  virt_net:
-    name: "air_prov"
-    autostart: true
-
-- name: "Define network"
-  virt_net:
-    command: define
-    xml: '{{ lookup("template", "air_nat.xml.j2") }}'
-    name: "air_nat"
-
-- name: "Start network"
-  virt_net:
-    state: active
-    name: "air_nat"
-
-- name: "Autostart network"
-  virt_net:
-    name: "air_nat"
-    autostart: true
+    - virt_net:
+        name: "{{ item }}"
+        autostart: true
+      with_items:
+        - "air_prov"
+        - "air_nat"
 
 - name: "Create nodes"
-  include_tasks: create-vm.yaml
-  with_sequence:
-    start=0 end="{{ vm.node_count-1 | int }}"
+  include_tasks: create-vms.yaml
+  with_items: 
+    - "{{ nodes }}"
   loop_control:
     loop_var: vm_instance
