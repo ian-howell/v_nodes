@@ -25,8 +25,8 @@
         --machine pc \
         --name "{{ libvirt_domain_name }}" \
         --memory "{{ vm.memory }}" \
-        --network network="air_nat",mac="{{ vm.bootMacAddress[ vm_instance | int ] }}" \
-        --network network="air_prov",mac="{{ vm.bootMacAddress[ vm_instance | int ] }}" \
+        --network network="air_nat",address.type='pci',address.domain=0,address.bus=0,address.slot=3,address.function=0,mac="{{ vm.bootMacAddress[ vm_instance | int ] }}" \
+        --network network="air_prov",address.type='pci',address.domain=0,address.bus=0,address.slot=4,address.function=0 \
         --cpu host-passthrough \
         --vcpus "{{ vm.vcpus | int }}" \
         --import \
