@@ -1,0 +1,7 @@
+- name: Create bootstraphost
+    template:
+        src: bootstraphost.yaml.j2
+        dest: "/opt/airshipctl/shared/baremetalhost/node02/bootstraphost-{{ a_node }}.yaml"
+
+- name: Output file
+  shell: "cat /opt/airshipctl/shared/baremetalhost/node02/bootstraphost-{{ a_node }}.yaml"

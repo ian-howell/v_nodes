@@ -1,0 +1,42 @@
+floorplan:
+  image_pool: "/var/lib/libvirt/images"
+  default_image_pool: "/var/lib/libvirt/default"
+  uri: "qemu:///system"
+  os_variant: "ubuntu18.04"
+
+nodes:
+  - class: master
+    count: 1
+    name: air-ephemeral
+    cpu: 1
+    ram: 2048
+    bootMacAddress: "52:54:00:b6:ed:31"
+    block:
+      - 2048M
+      - 2048M
+      - 3096M
+  - class: worker
+    count: 3
+    name: air-worker
+    cpu: 1
+    ram: 1024
+    bootMacAddress: "52:54:00:9b:27:4c"
+    block:
+      - 2048M
+# 1st item must be the oobm network, 2nd the provisioning
+networks:
+  - name: provisioning
+    bridge: "air_prov"
+    ip:
+      address: "10.23.24.1"
+      netmask: "255.255.255.0"
+  - name: nat
+    bridge: "air_nat"
+    ip:
+      address: "10.23.25.1"
+      netmask: "255.255.255.0"
+  - name: default
+    bridge: "default"
+    ip:
+      address: "10.23.25.1"
+      netmask: "255.255.255.0"

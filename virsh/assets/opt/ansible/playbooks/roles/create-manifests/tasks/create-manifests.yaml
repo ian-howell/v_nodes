@@ -1,8 +1,8 @@
 - debug:
     msg: "{{ vm_instance }}"
 
-- name: "Create vms"
-  include_tasks: create-vm.yaml
+- name: "Create manifest"
+  include_tasks: create-manifest.yaml
   with_sequence: start=1 end="{{vm_instance.count | int}}"
   loop_control:
     loop_var: a_node

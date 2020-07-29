@@ -1,0 +1,6 @@
+- name: "Create nodes"
+  include_tasks: create-manifests.yaml
+  with_items: 
+    - "{{ nodes }}"
+  loop_control:
+    loop_var: vm_instance
