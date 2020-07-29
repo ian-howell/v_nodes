@@ -6,6 +6,9 @@ curl --insecure https://username:password@127.0.0.1:8443/redfish/v1/Systems/
 git clone https://github.com/airshipit/airshipctl.git /opt/airshipctl
 
 cd /opt/airshipctl
+git checkout c64ad2db4f3793e0af96fef670752a9aeb45bc90
+
+git status
 make docker-image
 docker run --rm quay.io/airshipit/airshipctl:dev version
 docker run --rm quay.io/airshipit/airshipctl:dev --help

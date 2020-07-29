@@ -11,7 +11,7 @@
   shell: |
         qemu-img create \
             -f qcow2 \
-            "{{ floorplan.image_pool }}/{{ vm_instance.name }}-{{qcow_rand}}".qcow2 "{{ vm_instance.block[seq | int] }}"
+            "{{ floorplan.image_pool }}/{{ vm_instance.name }}-{{ seq }}{{qcow_rand}}".qcow2 "{{ vm_instance.block[seq | int] }}"
   with_sequence:
     start=0 end="{{ (vm_instance.block | length | int )-1}}"
   loop_control:
@@ -34,7 +34,7 @@
         --connect "{{ floorplan.uri }}" \
         --os-variant "{{ floorplan.os_variant }}" \
         --machine pc \
-        --name "{{ vm_instance.name }}-{{ a_node }}" \
+        --name "{{ vm_instance.name }}" \
         --memory "{{ vm_instance.ram }}" \
         --network network="air_nat",address.type='pci',address.domain=0,address.bus=0,address.slot=3,address.function=0 \
         --network network="air_prov",address.type='pci',address.domain=0,address.bus=0,address.slot=4,address.function=0 \
@@ -42,7 +42,7 @@
         --vcpus "{{ vm_instance.cpu | int }}" \
         --import \
         {% for i in range(0, (vm_instance.block | length | int )-1) %}
-        --disk "{{ floorplan.image_pool }}/{{ vm_instance.name }}-{{ qcow_rand }}.qcow2,bus=scsi,format=qcow2" \
+        --disk "{{ floorplan.image_pool }}/{{ vm_instance.name }}-{{i}}{{ qcow_rand }}.qcow2,bus=scsi,format=qcow2" \
         {% endfor %}
         --nographics \
         --noautoconsole \

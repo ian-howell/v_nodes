@@ -6,9 +6,9 @@ floorplan:
 
 nodes:
   - class: master
-    count: 3
+    count: 1
     name: air-ephemeral
-    cpu: 2
+    cpu: 1
     ram: 2048
     bootMacAddress: "52:54:00:b6:ed:31"
     block:
