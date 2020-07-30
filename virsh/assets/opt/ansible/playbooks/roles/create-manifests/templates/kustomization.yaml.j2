@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - "baremetalhost-{{ a_node }}.yaml"
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+secretGenerator:
+  - name: "node0{{ a_node }}-network-data"
+    files:
+      - networkData
+  - name: "node0{{ a_node }}-bmc-secret"
+    literals:
+      - username=username
+      - password=password
