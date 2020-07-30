@@ -7,7 +7,7 @@
 - name: Create bootstraphost
   template:
     src: bootstraphost.yaml.j2
-    dest: "/opt/airshipctl/manifests/site/test-site/hared/baremetalhost/node0{{ a_node }}/bootstraphost.yaml"
+    dest: "/opt/airshipctl/manifests/site/test-site/shared/baremetalhost/node0{{ a_node }}/bootstraphost.yaml"
   with_items: vm_instance
 - name: Output file
   shell: "cat /opt/airshipctl/manifests/site/test-site/shared/baremetalhost/node0{{ a_node }}/bootstraphost.yaml"
