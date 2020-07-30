@@ -1,21 +1,21 @@
 - name: Create a directory if it does not exist
   file:
-    path: /opt/airshipctl/shared/baremetalhost/node0{{ a_node }}
+    path: /opt/airshipctl/manifests/site/test-site/shared/baremetalhost/node0{{ a_node }}
     state: directory
     mode: '0755'
 
 - name: Create bootstraphost
   template:
     src: bootstraphost.yaml.j2
-    dest: "/opt/airshipctl/shared/baremetalhost/node0{{ a_node }}/bootstraphost.yaml"
+    dest: "/opt/airshipctl/manifests/site/test-site/hared/baremetalhost/node0{{ a_node }}/bootstraphost.yaml"
   with_items: vm_instance
 - name: Output file
-  shell: "cat /opt/airshipctl/shared/baremetalhost/node0{{ a_node }}/bootstraphost.yaml"
+  shell: "cat /opt/airshipctl/manifests/site/test-site/shared/baremetalhost/node0{{ a_node }}/bootstraphost.yaml"
 
 - name: Create node kustomization
   template:
     src: kustomization.yaml.j2
-    dest: "/opt/airshipctl/shared/baremetalhost/node0{{ a_node }}/kustomization.yaml"
+    dest: "/opt/airshipctl/manifests/site/test-site/shared/baremetalhost/node0{{ a_node }}/kustomization.yaml"
   with_items: vm_instance
 - name: Output file
-  shell: "cat /opt/airshipctl/shared/baremetalhost/node0{{ a_node }}/kustomization.yaml"
+  shell: "cat /opt/airshipctl/manifests/site/test-site/shared/baremetalhost/node0{{ a_node }}/kustomization.yaml"
