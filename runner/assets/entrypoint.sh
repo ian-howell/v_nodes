@@ -9,7 +9,6 @@ git clone https://github.com/slfletch/v_nodes.git /tmp/v_nodes
 cd /opt/airshipctl
 git checkout c64ad2db4f3793e0af96fef670752a9aeb45bc90
 
-tail -f /dev/null
 ansible-playbook -v -i /tmp/v_nodes/opt/ansible/playbooks/inventory.yaml /tmp/v_nodes/virsh/assets/opt/ansible/playbooks/create-manifests.yaml -vv
 
 git status
