@@ -8,7 +8,7 @@ metadata:
   name: node02
 spec:
   online: true
-  bootMACAddress: "{{ vm_instance.bootMacAddress }}"
+  bootMACAddress: "{{ macAddress.stdout }}"
   networkData:
     name: node02-network-data
     namespace: default

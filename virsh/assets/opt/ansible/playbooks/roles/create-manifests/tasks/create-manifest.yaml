@@ -4,6 +4,10 @@
     state: directory
     mode: '0755'
 
+- name: "Create boot MacAddress"
+  command: echo $(echo "{{ vm_instance.name }}-{{ a_node }}"|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')
+  register: macAddress
+
 - name: Create bootstraphost
   template:
     src: bootstraphost.yaml.j2

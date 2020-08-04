@@ -10,7 +10,6 @@ nodes:
     name: air-ephemeral
     cpu: 1
     ram: 2048
-    bootMacAddress: "52:54:00:b6:ed:31"
     block:
       - 2048M
       - 2048M
@@ -20,7 +19,6 @@ nodes:
     name: air-worker
     cpu: 1
     ram: 1024
-    bootMacAddress: "52:54:00:9b:27:4c"
     block:
       - 2048M
 # 1st item must be the oobm network, 2nd the provisioning

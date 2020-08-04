@@ -26,6 +26,10 @@
     entry: "u:libvirt-qemu:r-x"
     state: present
 
+- name: "Create boot MacAddress"
+  shell: echo $(echo "{{ vm_instance.name }}-{{ a_node }}"|md5sum|sed 's/^\(..\)\(..\)\(..\)\(..\)\(..\).*$/02:\1:\2:\3:\4:\5/')
+  register: bootMacAddress
+
 - name: Define vm xml
 #
         #--network network="air_nat",address.type='pci',address.domain=0,address.bus=0,address.slot=3,address.function=0,mac="{{ vm_instance.bootMacAddress }}"
@@ -34,9 +38,9 @@
         --connect "{{ floorplan.uri }}" \
         --os-variant "{{ floorplan.os_variant }}" \
         --machine pc \
-        --name "{{ vm_instance.name }}" \
+        --name "{{ vm_instance.name }}-{{a_node}}" \
         --memory "{{ vm_instance.ram }}" \
-        --network network="air_nat",address.type='pci',address.domain=0,address.bus=0,address.slot=3,address.function=0 \
+        --network network="air_nat",address.type='pci',address.domain=0,address.bus=0,address.slot=3,address.function=0,mac="{{ bootMacAddress.stdout }}" \
         --network network="air_prov",address.type='pci',address.domain=0,address.bus=0,address.slot=4,address.function=0 \
         --cpu host-passthrough \
         --vcpus "{{ vm_instance.cpu | int }}" \
