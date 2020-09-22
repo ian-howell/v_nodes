@@ -20,11 +20,10 @@ docker run --rm quay.io/airshipit/airshipctl:dev --help
 ./tools/deployment/22_test_configs.sh
 ./tools/deployment/23_pull_documents.sh
 export USER=root
-#https://github.com/sudo-project/sudo/issues/42
+# https://github.com/sudo-project/sudo/issues/42
 echo "Set disable_coredump false" >> /etc/sudo.conf
 tail -f /dev/null
 ./tools/deployment/24_build_ephemeral_iso.sh
 
-
-#./tools/deployment/25_deploy_ephemeral_node.sh
+# ./tools/deployment/25_deploy_ephemeral_node.sh
 tail -f /dev/null
