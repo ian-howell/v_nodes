@@ -45,7 +45,7 @@
         --cpu host-passthrough \
         --vcpus "{{ vm_instance.cpu | int }}" \
         --import \
-        {% for i in range(0, (vm_instance.block | length | int )-1) %}
+        {% for i in range(0, (vm_instance.block | length | int )) %}
         --disk "{{ floorplan.image_pool }}/{{ vm_instance.name }}-{{i}}{{ qcow_rand }}.qcow2,bus=scsi,format=qcow2" \
         {% endfor %}
         --nographics \
