@@ -5,16 +5,16 @@ metadata:
   labels:
     airshipit.org/ephemeral-node: "true"
     airshipit.org/deploy-k8s: "false"
-  name: node02
+  name: node0{{ a_node }}
 spec:
   online: true
   bootMACAddress: "{{ macAddress.stdout }}"
   networkData:
-    name: node02-network-data
+    name: node0{{ a_node }}-network-data
     namespace: default
   bmc:
     address: "redfish+https://localhost:8443/redfish/v1/Systems/{{ vm_instance.name }}-{{ a_node }}"
-    credentialsName: node02-bmc-secret
+    credentialsName: node0{{ a_node }}-bmc-secret
 status:
   provisioning:
 # we need this status to make sure, that the host is not going to be
