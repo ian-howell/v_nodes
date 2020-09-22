@@ -17,6 +17,10 @@ RUN apt-get update ;\
         sudo \
         iproute2 \
         bridge-utils \
+        iputils-ping \
+        net-tools \
+        less \
+        vim \
         openssh-client ;\
     pip3 install --upgrade wheel ;\
     pip3 install --upgrade ansible ;\
