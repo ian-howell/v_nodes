@@ -4,7 +4,7 @@ docker info
 curl --insecure https://username:password@127.0.0.1:8443/redfish/v1/Systems/
 
 git clone https://github.com/slfletch/airshipctl.git /opt/airshipctl
-git clone https://github.com/slfletch/v_nodes.git /tmp/v_nodes
+git clone https://github.com/ian-howell/v_nodes.git /tmp/v_nodes
 
 cd /opt/airshipctl
 git checkout c64ad2db4f3793e0af96fef670752a9aeb45bc90

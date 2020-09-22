@@ -1,4 +1,4 @@
-FROM vairship/base:latest
+FROM ianhowell/base:test
 
 SHELL ["bash", "-exc"]
 ENV DEBIAN_FRONTEND noninteractive

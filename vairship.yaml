@@ -6,7 +6,7 @@ spec:
   hostNetwork: false 
   containers:
   - name: libvirt
-    image: vairship/libvirt:2
+    image: ianhowell/libvirt:test
     tty: true
     securityContext:
       privileged: true
@@ -64,7 +64,7 @@ spec:
         mountPath: /sys/fs/cgroup
         readOnly: false
   - name: virsh
-    image: vairship/virsh:2
+    image: ianhowell/virsh:test
     securityContext:
       privileged: true
     command:
@@ -83,7 +83,7 @@ spec:
     - name: var-run-libvirt
       mountPath: /var/run/libvirt
   - name: sushy
-    image: vairship/sushy:2
+    image: ianhowell/sushy:test
     securityContext:
       privileged: true
     command:
@@ -173,8 +173,8 @@ spec:
     volumeMounts:
       - name: srv
         mountPath: /srv/
-  - name: runner 
-    image: vairship/runner:2
+  - name: runner
+    image: ianhowell/runner:test
     command:
       - /entrypoint.sh
     volumeMounts:
