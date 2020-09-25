@@ -4,6 +4,9 @@ FROM ${BASE_IMAGE}
 SHELL ["bash", "-exc"]
 ENV DEBIAN_FRONTEND noninteractive
 
+ARG ARTIFACTS_DIR=/opt/aiap-artifacts
+ENV ARTIFACTS_DIR=$ARTIFACTS_DIR
+
 # Update distro and install common reqs
 RUN apt-get update ;\
     apt-get dist-upgrade -y ;\
@@ -24,4 +27,5 @@ RUN apt-get update ;\
         openssh-client ;\
     pip3 install --upgrade wheel ;\
     pip3 install --upgrade ansible ;\
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* ; \
+    mkdir -p "$ARTIFACTS_DIR"

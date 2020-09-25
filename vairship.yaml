@@ -173,18 +173,30 @@ spec:
     volumeMounts:
       - name: srv
         mountPath: /srv/
-  - name: runner
-    image: ianhowell/runner:test
+  - name: airshipctl-builder
+    image: ianhowell/airshipctl-builder:test
     command:
       - /entrypoint.sh
     volumeMounts:
-      - name: var-run-vairship
-        mountPath: /var/run/vairship/
       - name: var-run-docker
         mountPath: /var/run/
-      - name: srv
-        mountPath: /srv/
+      - name: artifacts
+        mountPath: /opt/aiap-artifacts
+  # - name: runner
+  #   image: ianhowell/runner:test
+  #   command:
+  #     - /entrypoint.sh
+  #   volumeMounts:
+  #     - name: var-run-vairship
+  #       mountPath: /var/run/vairship/
+  #     - name: var-run-docker
+  #       mountPath: /var/run/
+  #     - name: srv
+  #       mountPath: /srv/
   volumes:
+    - name: artifacts
+      hostPath:
+        path: /opt/aiap-artifacts
     - name: dev
       hostPath:
         path: /dev

@@ -1,7 +1,7 @@
 # APP INFO
 BUILD_DIR         := $(shell mktemp -d)
 IMAGE_REGISTRY    ?= ianhowell
-IMAGE_NAME        ?= base,virsh,libvirt,sushy,runner
+IMAGE_NAME        ?= base,virsh,libvirt,sushy,airshipctl-builder,runner
 IMAGE_TAG         ?= test
 HELM              ?= $(BUILD_DIR)/helm
 PROXY             ?= http://proxy.foo.com:8000
@@ -30,6 +30,7 @@ build: ## Build the containers.
 	docker build --tag $(IMAGE_REGISTRY)/sushy:$(IMAGE_TAG) ./sushy
 	docker build --tag $(IMAGE_REGISTRY)/virsh:$(IMAGE_TAG) ./virsh
 	docker build --tag $(IMAGE_REGISTRY)/runner:$(IMAGE_TAG) ./runner
+	docker build --tag $(IMAGE_REGISTRY)/airshipctl-builder:$(IMAGE_TAG) ./airshipctl-builder
 
 push: build ## Build and push the containers
 	docker push $(IMAGE_REGISTRY)/base:$(IMAGE_TAG)
@@ -37,6 +38,7 @@ push: build ## Build and push the containers
 	docker push $(IMAGE_REGISTRY)/sushy:$(IMAGE_TAG)
 	docker push $(IMAGE_REGISTRY)/virsh:$(IMAGE_TAG)
 	docker push $(IMAGE_REGISTRY)/runner:$(IMAGE_TAG)
+	docker push $(IMAGE_REGISTRY)/airshipctl-builder:$(IMAGE_TAG)
 
 test: push ## Test vairship-pod
 	kubectl delete -f vairship.yaml || true
