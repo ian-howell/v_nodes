@@ -3,11 +3,11 @@ set -ex
 
 airshipctl_dir="/opt/airshipctl"
 mkdir -p "$airshipctl_dir"
-
-git clone "$AIRSHIPCTL_REPO" "$airshipctl_dir"
-
 cd "$airshipctl_dir"
-git checkout "$AIRSHIPCTL_REF"
+
+git init
+git fetch "$AIRSHIPCTL_REPO" "$AIRSHIPCTL_REF"
+git checkout FETCH_HEAD
 
 ./tools/deployment/21_systemwide_executable.sh
 

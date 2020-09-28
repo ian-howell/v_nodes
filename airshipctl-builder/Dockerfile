@@ -3,7 +3,7 @@ FROM ianhowell/base:test
 SHELL ["bash", "-exc"]
 ENV DEBIAN_FRONTEND noninteractive
 
-ARG AIRSHIPCTL_REPO=https://github.com/airshipit/airshipctl.git
+ARG AIRSHIPCTL_REPO=https://review.opendev.org/airship/airshipctl
 ARG AIRSHIPCTL_REF=master
 
 ENV AIRSHIPCTL_REPO=$AIRSHIPCTL_REPO

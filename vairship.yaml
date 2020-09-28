@@ -182,6 +182,11 @@ spec:
         mountPath: /var/run/
       - name: artifacts
         mountPath: /opt/aiap-artifacts
+    env:
+      - name: AIRSHIPCTL_REPO
+        value: https://review.opendev.org/airship/airshipctl
+      - name: AIRSHIPCTL_REF
+        value: master
   # - name: runner
   #   image: ianhowell/runner:test
   #   command:
