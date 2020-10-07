@@ -3,8 +3,22 @@ kind: Pod
 metadata:
   name: vairship
 spec:
-  hostNetwork: false 
+  hostNetwork: false
+  restartPolicy: OnFailure
   containers:
+  - name: dind
+    image: docker:stable-dind
+    securityContext:
+      privileged: true
+    volumeMounts:
+      - name: var-run-vairship
+        mountPath: /var/run/vairship/
+      - name: dind-storage
+        mountPath: /var/lib/docker
+      - name: var-run-docker
+        mountPath: /var/run/
+      - name: srv
+        mountPath: /srv/
   - name: libvirt
     image: ianhowell/libvirt:test
     tty: true
@@ -14,12 +28,7 @@ spec:
     command:
       - bash
       - -cex
-      - |
-        # rm -rf /dev/console
-        # if ! [ -e /dev/console ] ; then
-        #   socat -u pty,link=/dev/console stdout &
-        # fi
-        exec /usr/lib/systemd/systemd
+      - "exec /usr/lib/systemd/systemd"
     env:
       - name: container
         value: docker
@@ -30,12 +39,6 @@ spec:
           - version
       initialDelaySeconds: 5
       periodSeconds: 5
-    # livenessProbe:
-    #   httpGet:
-    #     path: /healthz
-    #     port: liveness-port
-    #   failureThreshold: 1
-    #   periodSeconds: 10
     startupProbe:
       exec:
         command:
@@ -63,120 +66,81 @@ spec:
       - name: sys-fs-cgroup
         mountPath: /sys/fs/cgroup
         readOnly: false
-  - name: virsh
-    image: ianhowell/virsh:test
-    securityContext:
-      privileged: true
-    command:
-    - bash
-    - -cex
-    - |
-      /entrypoint.sh create
-      tail -f /dev/null 
-    volumeMounts:
-    - name: var-run-vairship
-      mountPath: /var/run/vairship/
-    - name: var-lib-libvirt-images
-      mountPath: /var/lib/libvirt/images
-    - name: var-lib-libvirt-default
-      mountPath: /var/lib/libvirt/default
-    - name: var-run-libvirt
-      mountPath: /var/run/libvirt
-  - name: sushy
-    image: ianhowell/sushy:test
-    securityContext:
-      privileged: true
-    command:
-      - bash
-      - -cex
-      - |
-        /entrypoint.sh
-        tail -f /dev/null 
-    volumeMounts:
-      - name: var-run-vairship
-        mountPath: /var/run/vairship/
-      - name: var-run-libvirt
-        mountPath: /var/run/libvirt
-      - name: var-lib-libvirt-default
-        mountPath: /var/lib/libvirt/default
-  - name: dind
-    image: docker:stable-dind
-    securityContext:
-      privileged: true
-    volumeMounts:
-      - name: var-run-vairship
-        mountPath: /var/run/vairship/
-      - name: dind-storage
-        mountPath: /var/lib/docker
-      - name: var-run-docker
-        mountPath: /var/run/
-      - name: srv
-        mountPath: /srv/
-  - name: nginx 
-    image: nginx:latest
-    command:
-      - bash
-      - -cex
-      - |
-        tee /etc/nginx/nginx.conf <<'EOF'
-
-        user  nginx;
-        worker_processes  1;
-
-        error_log  /var/log/nginx/error.log warn;
-        pid        /var/run/nginx.pid;
-
-
-        events {
-            worker_connections  1024;
-        }
+  # - name: sushy
+  #   image: ianhowell/sushy:test
+  #   securityContext:
+  #     privileged: true
+  #   command:
+  #     - bash
+  #     - -cex
+  #     - |
+  #       /entrypoint.sh
+  #       tail -f /dev/null
+  #   volumeMounts:
+  #     - name: var-run-vairship
+  #       mountPath: /var/run/vairship/
+  #     - name: var-run-libvirt
+  #       mountPath: /var/run/libvirt
+  #     - name: var-lib-libvirt-default
+  #       mountPath: /var/lib/libvirt/default
+  #- name: nginx
+  #  image: nginx:latest
+  #  command:
+  #    - bash
+  #    - -cex
+  #    - |
+  #      tee /etc/nginx/nginx.conf <<'EOF'
+  #      user  nginx;
+  #      worker_processes  1;
+  #      error_log  /var/log/nginx/error.log warn;
+  #      pid        /var/run/nginx.pid;
+  #      events {
+  #          worker_connections  1024;
+  #      }
+  #      http {
+  #          include       /etc/nginx/mime.types;
+  #          default_type  application/octet-stream;
+  #          log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+  #                            '$status $body_bytes_sent "$http_referer" '
+  #                            '"$http_user_agent" "$http_x_forwarded_for"';
+  #          access_log  /var/log/nginx/access.log  main;
+  #          sendfile        on;
+  #          #tcp_nopush     on;
+  #          keepalive_timeout  65;
+  #          #gzip  on;
+  #          server {
+  #              listen       8099;
+  #              listen  [::]:8099;
+  #              server_name  localhost;
+  #              #charset koi8-r;
+  #              #access_log  /var/log/nginx/host.access.log  main;
+  #              location / {
+  #                  root   /srv/iso;
+  #                  autoindex on;
+  #              }
+  #              error_page   500 502 503 504  /50x.html;
+  #              location = /50x.html {
+  #                  root   /usr/share/nginx/html;
+  #              }
+  #          }
+  #      }
+  #      EOF
+  #      exec nginx -g 'daemon off;'
+  #  volumeMounts:
+  #    - name: srv
+  #      mountPath: /srv/
 
 
-        http {
-            include       /etc/nginx/mime.types;
-            default_type  application/octet-stream;
 
-            log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                              '$status $body_bytes_sent "$http_referer" '
-                              '"$http_user_agent" "$http_x_forwarded_for"';
-
-            access_log  /var/log/nginx/access.log  main;
-
-            sendfile        on;
-            #tcp_nopush     on;
-
-            keepalive_timeout  65;
-
-            #gzip  on;
-
-            server {
-                listen       8099;
-                listen  [::]:8099;
-                server_name  localhost;
-
-                #charset koi8-r;
-                #access_log  /var/log/nginx/host.access.log  main;
-
-                location / {
-                    root   /srv/iso;
-                    autoindex on;
-                }
-
-                error_page   500 502 503 504  /50x.html;
-                location = /50x.html {
-                    root   /usr/share/nginx/html;
-                }
-            }
-        }
-        EOF
-        exec nginx -g 'daemon off;'
-    volumeMounts:
-      - name: srv
-        mountPath: /srv/
   - name: airshipctl-builder
     image: ianhowell/airshipctl-builder:test
     command:
       - /entrypoint.sh
+    readinessProbe:
+      exec:
+        command:
+          - stat
+          - /opt/aiap-artifacts/airshipctl
     volumeMounts:
       - name: var-run-docker
         mountPath: /var/run/
@@ -187,17 +151,44 @@ spec:
         value: https://review.opendev.org/airship/airshipctl
       - name: AIRSHIPCTL_REF
         value: master
-  # - name: runner
-  #   image: ianhowell/runner:test
-  #   command:
-  #     - /entrypoint.sh
-  #   volumeMounts:
-  #     - name: var-run-vairship
-  #       mountPath: /var/run/vairship/
-  #     - name: var-run-docker
-  #       mountPath: /var/run/
-  #     - name: srv
-  #       mountPath: /srv/
+      - name: ARTIFACTS_DIR
+        value: /opt/aiap-artifacts
+  - name: infra-builder
+    image: ianhowell/infra-builder:test
+    securityContext:
+      privileged: true
+    command:
+    - bash
+    - -cex
+    - |
+      /entrypoint.sh create
+      tail -f /dev/null
+    volumeMounts:
+    - name: var-run-vairship
+      mountPath: /var/run/vairship/
+    - name: var-run-docker
+      mountPath: /var/run/
+    - name: var-lib-libvirt-images
+      mountPath: /var/lib/libvirt/images
+    - name: var-lib-libvirt-default
+      mountPath: /var/lib/libvirt/default
+    - name: var-run-libvirt
+      mountPath: /var/run/libvirt
+    - name: artifacts
+      mountPath: /opt/aiap-artifacts
+  #- name: runner
+  #  image: ianhowell/runner:test
+  #  command:
+  #    - /entrypoint.sh
+  #  volumeMounts:
+  #    - name: var-run-vairship
+  #      mountPath: /var/run/vairship/
+  #    - name: var-run-docker
+  #      mountPath: /var/run/
+  #    - name: srv
+  #      mountPath: /srv/
+  #    - name: artifacts
+  #      mountPath: /opt/aiap-artifacts
   volumes:
     - name: artifacts
       hostPath:

@@ -4,29 +4,6 @@
     entry: "u:libvirt-qemu:r-x"
     state: present
 
-- name: "Delete storage pools"
-  block:
-    # Stop a storage pool
-    - virt_pool:
-        command: destroy
-        name: "{{ item }}"
-      with_items:
-        - default
-      ignore_errors: true
-# Delete a storage pool (destroys contents)
-    - virt_pool:
-        command: delete
-        name: "{{ item }}"
-      with_items:
-        - default
-      ignore_errors: true
-    - virt_pool:
-        command: undefine
-        name: "{{ item }}"
-      with_items:
-        - default
-      ignore_errors: true
-
 - name: "Define, Build, and Start default storage pool"
   block:
     - virt_pool:
@@ -41,12 +18,7 @@
         name: "{{ item }}"
       with_items:
         - default
-  
-    - virt_pool:
-        command: create
-        name: "{{ item }}"
-      with_items:
-        - default
+
     - virt_pool:
         command: list_pools
 
@@ -74,9 +46,12 @@
         - "air_prov"
         - "air_nat"
 
-- name: "Create nodes"
-  include_tasks: create-vms.yaml
-  with_items: 
+- name: "Create ephemeral node"
+  include_tasks: create-ephemeral-node.yaml
+  with_items:
     - "{{ nodes }}"
   loop_control:
     loop_var: vm_instance
+
+# - name: "Create nodes"
+#   include_tasks: create-worker-nodes.yaml

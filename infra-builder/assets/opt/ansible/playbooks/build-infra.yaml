@@ -1,0 +1,72 @@
+---
+- hosts: localhost
+  tasks:
+
+  - name: set default vars
+    set_fact:
+      var_files_default:
+
+  - name: read variables
+    include_vars:
+      file: "vars/{{ var_file }}"
+    with_items:
+    - airship-ipam.yaml
+    - config.yaml
+    loop_control:
+      loop_var: var_file
+
+  - name: install kustomize
+    include_role:
+      name: install-kustomize
+
+  - name: create kustomize plugins
+    command:
+      chdir: "$ARTIFACTS_DIR/airshipctl"
+      cmd: "./tools/document/build_kustomize_plugin.sh"
+
+  - name: make sure serve directory exists
+    file:
+      dest: /srv/iso
+      state: directory
+      mode: "0755"
+      owner: "{{ ansible_user }}"
+    become: yes
+
+  - name: get VM config(MACs and bootMode) from BareMetalHost objects
+    include_tasks:
+      file: get-vm-config.yaml
+    vars:
+      name: "{{ roleinputvar.name }}"
+      path: "{{ roleinputvar.path }}"
+      airship_config_manifest_directory: "$ARTIFACTS_DIR/airshipctl"
+    loop:
+    - { name: 'target', path: 'ephemeral/controlplane' }
+    - { name: 'ephemeral', path: 'ephemeral/bootstrap' }
+    loop_control:
+      loop_var: roleinputvar
+
+  - name: Setup VMs
+    include_role:
+      name: build-infra
+    vars:
+      airship_gate_libvirt_pools:
+      - path: /var/lib/libvirt/airship
+        name: "airship"
+      - path: /var/lib/libvirt/images
+        name: "default"
+
+      airship_gate_libvirt_volumes:
+        disk_format: qcow2
+        ephemeral_disk_size: 2048M
+        target_disk_size: 2048M
+        target_vms_count: 3
+
+      airship_gate_libvirt_domains:
+        ephemeral_vm_cfg: "{{ ephemeral_vm_cfg }}"
+        ephemeral_vm_vcpus: 1
+        ephemeral_vm_memory_mb: 2048
+        target_vm_cfg: "{{ target_vm_cfg }}"
+        target_vm_vcpus: 1
+        target_vm_memory_mb: 1024
+        # TODO: this is the same as above - deduplicate
+        target_vms_count: 3

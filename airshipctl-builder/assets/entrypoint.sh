@@ -1,7 +1,7 @@
 #!/bin/bash
 set -ex
 
-airshipctl_dir="/opt/airshipctl"
+airshipctl_dir="$ARTIFACTS_DIR/airshipctl"
 mkdir -p "$airshipctl_dir"
 cd "$airshipctl_dir"
 
@@ -10,7 +10,8 @@ git fetch "$AIRSHIPCTL_REPO" "$AIRSHIPCTL_REF"
 git checkout FETCH_HEAD
 
 ./tools/deployment/21_systemwide_executable.sh
+mkdir -p bin
+cp "$(which airshipctl)" bin
 
-cp /usr/local/bin/airshipctl "$ARTIFACTS_DIR/airshipctl"
-
+# Keep the container alive
 tail -f /dev/null
