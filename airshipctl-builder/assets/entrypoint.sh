@@ -12,6 +12,7 @@ git checkout FETCH_HEAD
 ./tools/deployment/21_systemwide_executable.sh
 mkdir -p bin
 cp "$(which airshipctl)" bin
+cp -r "$HOME/.airship" "$ARTIFACTS_DIR"
 
 # Keep the container alive
 tail -f /dev/null

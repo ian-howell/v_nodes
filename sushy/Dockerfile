@@ -35,10 +35,6 @@ ENTRYPOINT /entrypoint.sh
 
 # curl --insecure https://username:password@127.0.0.1:8443/redfish/v1/Systems/
 
-# curl -L -u "username:password" --insecure  -d '{"ResetType":"On"}' \
-# -H "Content-Type: application/json" -X POST \
-# https://127.0.0.1:8443/redfish/v1/Systems/air-ephemeral-1/Actions/ComputerSystem.Reset
+# curl -L -u "username:password" --insecure  -d '{"ResetType":"On"}' -H "Content-Type: application/json" -X POST https://127.0.0.1:8443/redfish/v1/Systems/air-ephemeral/Actions/ComputerSystem.Reset
 
-# curl -L -u "username:password" --insecure  -d '{"ResetType":"ForceOff"}' \
-# -H "Content-Type: application/json" -X POST \
-# https://127.0.0.1:8443/redfish/v1/Systems/airshipdev-1/Actions/ComputerSystem.Reset
+# curl -L -u "username:password" --insecure  -d '{"ResetType":"ForceOff"}' -H "Content-Type: application/json" -X POST https://127.0.0.1:8443/redfish/v1/Systems/airshipdev-1/Actions/ComputerSystem.Reset

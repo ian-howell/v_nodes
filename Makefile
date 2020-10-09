@@ -15,6 +15,7 @@ PYTHON            = python3
 CHARTS            := $(patsubst charts/%/.,%,$(wildcard charts/*/.))
 DISTRO            ?= ubuntu_bionic
 IMAGE             := ${DOCKER_REGISTRY}/${IMAGE_PREFIX}/${IMAGE_NAME}:${IMAGE_TAG}-${DISTRO}
+USE_CACHE         ?= false
 
 .PHONY: help
 
@@ -39,6 +40,9 @@ push: build ## Build and push the containers
 	docker push $(IMAGE_REGISTRY)/infra-builder:$(IMAGE_TAG)
 	docker push $(IMAGE_REGISTRY)/airshipctl-builder:$(IMAGE_TAG)
 	docker push $(IMAGE_REGISTRY)/runner:$(IMAGE_TAG)
+
+test-with-cache: USE_CACHE = true
+test-with-cache: test
 
 test: push ## Test vairship-pod
 	kubectl delete -f vairship.yaml || true

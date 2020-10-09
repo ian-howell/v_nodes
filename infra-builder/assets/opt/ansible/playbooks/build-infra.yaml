@@ -24,14 +24,6 @@
       chdir: "$ARTIFACTS_DIR/airshipctl"
       cmd: "./tools/document/build_kustomize_plugin.sh"
 
-  - name: make sure serve directory exists
-    file:
-      dest: /srv/iso
-      state: directory
-      mode: "0755"
-      owner: "{{ ansible_user }}"
-    become: yes
-
   - name: get VM config(MACs and bootMode) from BareMetalHost objects
     include_tasks:
       file: get-vm-config.yaml

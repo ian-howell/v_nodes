@@ -26,6 +26,7 @@ RUN apt-get update ;\
     systemctl enable virtlogd ;\
     echo 'user = "root"' >> /etc/libvirt/qemu.conf ;\
     echo 'group = "root"' >> /etc/libvirt/qemu.conf ;\
+    sed -i 's|unix_sock_rw_perms = "0770"|unix_sock_rw_perms = "0777"|g' /etc/libvirt/libvirtd.conf ;\
     useradd -u 42424 -g libvirt -M -d /home/sushy -c "apache sushy user" sushy ;\
     mkdir -p /home/sushy ;\
     chown -R sushy /home/sushy
