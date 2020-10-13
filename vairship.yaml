@@ -195,6 +195,9 @@ spec:
         mountPath: /opt/aiap-artifacts
       - name: logs
         mountPath: /var/log/
+    # env:
+    #   - name: ISO_TARBALL
+    #     value: /opt/aiap-artifacts/iso.tar.gz
   volumes:
     - name: artifacts
       hostPath:

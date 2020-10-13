@@ -25,11 +25,11 @@ tail -f /dev/null
 
 if [[ -z "$ISO_TARBALL" ]]; then
   ./tools/deployment/24_build_ephemeral_iso.sh
-  tar --directory=/srv/iso -czf iso.tar.gz ./*
+  # TODO: this doesn't work - resolve it
+  # tar --directory=/srv/iso -czf iso.tar.gz ./*
 else
   mkdir -p /srv/iso
-  cd /srv/iso
-  tar -xzf "$ISO_TARBALL"
+  tar -xzf "$ISO_TARBALL" --directory /srv/iso
 fi
 
 # ./tools/deployment/25_deploy_ephemeral_node.sh
