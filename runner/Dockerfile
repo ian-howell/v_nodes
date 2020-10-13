@@ -5,8 +5,6 @@ ENV DEBIAN_FRONTEND noninteractive
 
 ARG k8s_version=v1.18.3
 ARG kubectl_url=https://storage.googleapis.com/kubernetes-release/release/"${k8s_version}"/bin/linux/amd64/kubectl
-ARG go_version=v1.18.3
-ARG kubectl_url=https://storage.googleapis.com/kubernetes-release/release/"${k8s_version}"/bin/linux/amd64/kubectl
 
 # Update distro and install ansible
 RUN apt-get update ;\
