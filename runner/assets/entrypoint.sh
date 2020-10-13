@@ -21,8 +21,6 @@ ansible-playbook -vvv /opt/ansible/playbooks/create-manifests.yaml
 ./tools/deployment/22_test_configs.sh
 ./tools/deployment/23_pull_documents.sh
 
-tail -f /dev/null
-
 if [[ -z "$ISO_TARBALL" ]]; then
   ./tools/deployment/24_build_ephemeral_iso.sh
   # TODO: this doesn't work - resolve it
@@ -32,5 +30,14 @@ else
   tar -xzf "$ISO_TARBALL" --directory /srv/iso
 fi
 
-# ./tools/deployment/25_deploy_ephemeral_node.sh
+./tools/deployment/25_deploy_ephemeral_node.sh
+./tools/deployment/26_deploy_metal3_capi_ephemeral_node.sh
+
+# ./tools/deployment/30_deploy_controlplane.sh
+# ./tools/deployment/31_deploy_initinfra_target_node.sh
+# ./tools/deployment/32_cluster_init_target_node.sh
+# ./tools/deployment/33_cluster_move_target_node.sh
+# ./tools/deployment/34_deploy_worker_node.sh
+# ./tools/deployment/35_deploy_workload.sh
+
 tail -f /dev/null

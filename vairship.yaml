@@ -193,6 +193,8 @@ spec:
         mountPath: /srv/
       - name: artifacts
         mountPath: /opt/aiap-artifacts
+      - name: var-run-libvirt
+        mountPath: /var/run/libvirt
       - name: logs
         mountPath: /var/log/
     # env:
