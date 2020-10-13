@@ -15,6 +15,7 @@ RUN apt-get update ;\
         apt-transport-https \
         ca-certificates \
         gnupg-agent \
+        libvirt-clients \
         software-properties-common \
         gettext-base ;\
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - ;\
